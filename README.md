@@ -1,1 +1,4 @@
 # Alerta-Digital---INFO-H
+
+Alerta Digital será um sistema informativo onde serão encontradas páginas explicativas sobre os golpes mais comuns e dicas de prevenção, além de uma comunidade onde as pessoas poderão compartilhar suas próprias experiências. A participação da comunidade seria essencial, permitindo que usuários enviem links de notícias para que outros avaliem se são verdadeiras ou falsas, promovendo colaboração e conscientização coletiva.
+Quais as funcionalidades principais: Será sistema informativo que reúna, além de páginas explicativas sobre os golpes mais comuns e dicas de prevenção, um chat onde as pessoas compartilhem suas próprias experiência. Esse sistema também poderá incluir uma parte voltada à educação sobre fake news explicando por que elas são criadas, como identificá-las e indicando fontes confiáveis de informação.
