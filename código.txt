@@ -1,0 +1,44 @@
+from django.shortcuts import render,redirect,get_object_or_404
+from .models import Doenca, Dieta, Alimento, Animal, Questionario, Sugestao, Artigo
+from django.views import View
+from django.contrib import messages
+from django.views.generic import ListView
+from django.views.decorators.csrf import csrf_protect
+
+class IndexView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'index.html')
+    def post(self, request):
+        pass
+
+class AnimalListView(ListView):
+    model = Animal
+    template_name = 'animal.html'  # Nome do seu template
+    context_object_name = 'animais'
+
+class AlimentoListView(ListView):
+    model = Alimento
+    template_name = 'alimento.html'
+    context_object_name = 'alimentos'
+
+class DoencaListView(ListView):
+    model = Doenca
+    template_name = 'doenca.html'
+    context_object_name = 'doencas'
+
+class DietaListView(ListView):
+    model = Dieta
+    template_name = 'dieta.html'
+    context_object_name = 'dietas'
+
+class ArtigoListView(ListView):
+    model = Artigo
+    template_name = "artigo.html"
+    context_object_name = "artigos"
+
+# Comentário temporário
+# class EspecificacoesTipoListView(ListView):
+#     model = Especificacoes
+#     template_name = 'especificacoes.html'
+#     context_object_name = 'especificacoes'
+
