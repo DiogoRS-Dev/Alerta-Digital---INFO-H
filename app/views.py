@@ -8,6 +8,7 @@ from .forms import (
     UsuarioForm, AdministradorForm, AcessoForm, MensagemForm,
     DenunciaForm, PerguntaForm, QuizForm, QuizPerguntaForm
 )
+from django.contrib.auth.decorators import login_required
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
@@ -126,6 +127,21 @@ class DenunciaCreateView(CreateView):
     template_name = "denuncias/form.html"
     success_url = reverse_lazy("denuncia_list")
 
+@login_required
+def fazer_denuncia(request):
+    if request.method == 'POST':
+        form = DenunciaForm(request.POST)
+        if form.is_valid():
+            denuncia = form.save(commit=False)
+            denuncia.usuario = request.user  # Associa ao usuário logado
+            denuncia.save()
+            return redirect('denuncia_sucesso')
+    else:
+        form = DenunciaForm()
+    return render(request, 'denuncias/form.html', {'form': form})
+
+def denuncia_sucesso(request):
+    return render(request, 'denuncias/sucesso.html')
 
 # ---------------------------
 # PERGUNTA
@@ -173,3 +189,13 @@ class QuizPerguntaCreateView(CreateView):
     form_class = QuizPerguntaForm
     template_name = "quiz_perguntas/form.html"
     success_url = reverse_lazy("quiz_pergunta_list")
+
+
+# ---------------------------
+# PÁGINAS DE GOLPES
+# ---------------------------
+class GolpeView(View):
+    def get(self, request, golpe_nome):
+        template_name = f"tipos_golpes/{golpe_nome}.html"
+        return render(request, template_name)
+

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Detalhes Usuário{% endblock %}
+{% block content %}
+<h1>Detalhes de {{ usuario.nome }}</h1>
+<ul class="list-group">
+    <li class="list-group-item"><b>CPF:</b> {{ usuario.cpf }}</li>
+    <li class="list-group-item"><b>Email:</b> {{ usuario.email }}</li>
+    <li class="list-group-item"><b>Data de Nascimento:</b> {{ usuario.data_nasc }}</li>
+</ul>
+<a href="{% url 'app:usuario_list' %}" class="btn btn-secondary mt-3">Voltar</a>
+{% endblock %}

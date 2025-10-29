@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo|default:"Golpe - Alerta Digital" }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: "Segoe UI", sans-serif;
+        }
+        header {
+            background-color: #6c63ff;
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+        }
+        .golpe-container {
+            max-width: 900px;
+            margin: 3rem auto;
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #6c63ff;
+            font-weight: 600;
+        }
+        img.ilustracao {
+            width: 100%;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background: #6c63ff;
+            color: white;
+            margin-top: 3rem;
+        }
+        .btn-voltar {
+            background-color: #6c63ff;
+            color: #fff;
+            border: none;
+        }
+        .btn-voltar:hover {
+            background-color: #554ff0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>{{ titulo|default:"Nome do Golpe" }}</h1>
+        <p>Alerta Digital — Prevenção e Conscientização</p>
+    </header>
+
+    <main class="golpe-container">
+        <img src="{{ imagem|default:'/static/imagens/golpe_exemplo.jpg' }}" alt="Imagem ilustrativa do golpe" class="ilustracao">
+
+        <section class="mb-4">
+            <h2>📋 Descrição</h2>
+            <p>{{ descricao|default:"Aqui vai uma breve explicação sobre como esse golpe costuma acontecer." }}</p>
+        </section>
+
+        <section class="mb-4">
+            <h2>⚠️ Como o golpe funciona</h2>
+            <p>{{ funcionamento|default:"Explique de forma simples o passo a passo do golpe, destacando os sinais de alerta." }}</p>
+        </section>
+
+        <section class="mb-4">
+            <h2>🛡️ Como se proteger</h2>
+            <ul>
+                {% if dicas %}
+                    {% for dica in dicas %}
+                        <li>{{ dica }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li>Nunca compartilhe informações pessoais ou senhas por mensagens.</li>
+                    <li>Desconfie de ofertas boas demais para ser verdade.</li>
+                    <li>Verifique sempre a fonte antes de clicar em links.</li>
+                {% endif %}
+            </ul>
+        </section>
+
+        <a href="/golpes/" class="btn btn-voltar mt-3">← Voltar à lista de golpes</a>
+    </main>
+
+    <footer>
+        <p>© 2025 Alerta Digital | Proteja-se contra golpes online</p>
+    </footer>
+
+</body>
+</html>

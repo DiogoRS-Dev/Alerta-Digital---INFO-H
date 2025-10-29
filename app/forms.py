@@ -41,7 +41,17 @@ class MensagemForm(forms.ModelForm):
 class DenunciaForm(forms.ModelForm):
     class Meta:
         model = Denuncia
-        fields = ["mensagem", "data_hora", "usuario"]
+        fields = ['mensagem']
+        widgets = {
+            'mensagem': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Descreva aqui o que deseja denunciar...'
+            })
+        }
+        labels = {
+            'mensagem': 'Mensagem da denúncia'
+        }
 
 
 class PerguntaForm(forms.ModelForm):

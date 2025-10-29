@@ -51,6 +51,8 @@ urlpatterns = [
     # Denúncias
     path("denuncias/", DenunciaListView.as_view(), name="denuncia_list"),
     path("denuncias/nova/", DenunciaCreateView.as_view(), name="denuncia_create"),
+    path('denunciar/', views.fazer_denuncia, name='fazer_denuncia'),
+    path('denuncia/sucesso/', views.denuncia_sucesso, name='denuncia_sucesso'),
 
     # Perguntas
     path("perguntas/", PerguntaListView.as_view(), name="pergunta_list"),
@@ -63,4 +65,14 @@ urlpatterns = [
     # QuizPergunta
     path("quiz-perguntas/", QuizPerguntaListView.as_view(), name="quiz_pergunta_list"),
     path("quiz-perguntas/nova/", QuizPerguntaCreateView.as_view(), name="quiz_pergunta_create"),
+
+        # Páginas de golpes
+    path("tipos_golpes/<str:golpe_nome>/", 
+         IndexView.as_view() if False else 
+         __import__('app.views', fromlist=['GolpeView']).GolpeView.as_view(),
+         name="golpe_detail"),
+
+
+#--------------------------------------------------------------------------------------------------------------------------------
+
 ]
