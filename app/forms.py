@@ -39,19 +39,20 @@ class MensagemForm(forms.ModelForm):
 
 
 class DenunciaForm(forms.ModelForm):
+    consentimento = forms.BooleanField(required=True, label="Concordo que as informações serão usadas para investigação")
+
     class Meta:
         model = Denuncia
-        fields = ['mensagem']
+        fields = ['categoria', 'descricao', 'email', 'anexo', 'consentimento']
         widgets = {
-            'mensagem': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 4,
-                'placeholder': 'Descreva aqui o que deseja denunciar...'
-            })
+            'descricao': forms.Textarea(attrs={'rows': 5, 'placeholder': 'Descreva o ocorrido com o máximo de detalhes.'}),
         }
-        labels = {
-            'mensagem': 'Mensagem da denúncia'
-        }
+
+    def clean_descricao(self):
+        desc = self.cleaned_data['descricao'].strip()
+        if len(desc) < 10:
+            raise forms.ValidationError("A descrição deve conter pelo menos 10 caracteres.")
+        return desc
 
 
 class PerguntaForm(forms.ModelForm):

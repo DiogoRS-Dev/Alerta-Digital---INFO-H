@@ -89,3 +89,22 @@ STATICFILES_DIRS = [
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Uploads
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Envio de emails
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # apenas para testes
+# Depois configure SMTP real:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.seudominio.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'usuario'
+# EMAIL_HOST_PASSWORD = 'senha'
+# EMAIL_USE_TLS = True
+# DEFAULT_FROM_EMAIL = 'no-reply@seudominio.com'
+
+# Segurança e privacidade
+CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True

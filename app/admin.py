@@ -28,8 +28,16 @@ class MensagemAdmin(admin.ModelAdmin):
 
 @admin.register(Denuncia)
 class DenunciaAdmin(admin.ModelAdmin):
-    list_display = ("id", "mensagem", "usuario", "data_hora")
-    search_fields = ("mensagem", "usuario__nome")
+    list_display = ('id', 'mensagem', 'usuario', 'data_hora')
+
+    def mensagem(self, obj):
+        return obj.descricao[:50] + ('...' if len(obj.descricao) > 50 else '')
+
+    def usuario(self, obj):
+        return obj.email or 'Anônimo'
+
+    def data_hora(self, obj):
+        return obj.criado_em.strftime('%d/%m/%Y %H:%M')
 
 
 @admin.register(Pergunta)

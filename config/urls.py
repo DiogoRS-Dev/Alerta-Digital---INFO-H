@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic import TemplateView
+from django.conf import settings
+from django.conf.urls.static import static
 
 from app.views import (
     IndexView,
@@ -13,20 +14,25 @@ from app.views import (
     # Mensagem
     MensagemListView, MensagemCreateView,
     # Denúncia
-    DenunciaListView, DenunciaCreateView,
+    DenunciaListView, DenunciaCreateView, fazer_denuncia, denuncia_sucesso,
     # Pergunta
     PerguntaListView, PerguntaCreateView,
     # Quiz
     QuizListView, QuizCreateView,
     # QuizPergunta
-    QuizPerguntaListView, QuizPerguntaCreateView
+    QuizPerguntaListView, QuizPerguntaCreateView,
+    # Golpes
+    GolpeView
 )
 
-app_name = "Alerta_Digital"  # substitua "app" pelo nome do seu ap
+app_name = "Alerta_Digital"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Página inicial
     path('', IndexView.as_view(), name='index'),
+
     # Usuários
     path("usuarios/", UsuarioListView.as_view(), name="usuario_list"),
     path("usuarios/<int:pk>/", UsuarioDetailView.as_view(), name="usuario_detail"),
@@ -51,8 +57,8 @@ urlpatterns = [
     # Denúncias
     path("denuncias/", DenunciaListView.as_view(), name="denuncia_list"),
     path("denuncias/nova/", DenunciaCreateView.as_view(), name="denuncia_create"),
-    path('denunciar/', views.fazer_denuncia, name='fazer_denuncia'),
-    path('denuncia/sucesso/', views.denuncia_sucesso, name='denuncia_sucesso'),
+    path('denunciar/', fazer_denuncia, name='fazer_denuncia'),
+    path('denuncia/sucesso/', denuncia_sucesso, name='denuncia_sucesso'),
 
     # Perguntas
     path("perguntas/", PerguntaListView.as_view(), name="pergunta_list"),
@@ -66,13 +72,9 @@ urlpatterns = [
     path("quiz-perguntas/", QuizPerguntaListView.as_view(), name="quiz_pergunta_list"),
     path("quiz-perguntas/nova/", QuizPerguntaCreateView.as_view(), name="quiz_pergunta_create"),
 
-        # Páginas de golpes
-    path("tipos_golpes/<str:golpe_nome>/", 
-         IndexView.as_view() if False else 
-         __import__('app.views', fromlist=['GolpeView']).GolpeView.as_view(),
-         name="golpe_detail"),
-
-
-#--------------------------------------------------------------------------------------------------------------------------------
-
+    # Páginas de golpes
+    path("tipos_golpes/<str:golpe_nome>/", GolpeView.as_view(), name="golpe_detail"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

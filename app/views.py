@@ -3,6 +3,7 @@ from django.views import View
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.core.mail import send_mail
 from .models import Usuario, Administrador, Acesso, Mensagem, Denuncia, Pergunta, Quiz, QuizPergunta
 from .forms import (
     UsuarioForm, AdministradorForm, AcessoForm, MensagemForm,
@@ -141,6 +142,33 @@ def fazer_denuncia(request):
     return render(request, 'denuncias/form.html', {'form': form})
 
 def denuncia_sucesso(request):
+    return render(request, 'denuncias/sucesso.html')
+
+def enviar_denuncia(request):
+    if request.method == 'POST':
+        form = DenunciaForm(request.POST, request.FILES)
+        if form.is_valid():
+            denuncia = form.save()
+
+            # Envia notificação por email (ajuste conforme settings)
+            send_mail(
+                subject=f"Nova denúncia - {denuncia.categoria}",
+                message=f"ID: {denuncia.id}\nCategoria: {denuncia.categoria}\nDescrição: {denuncia.descricao}\nEmail: {denuncia.email or 'não informado'}",
+                from_email=None,  # usa DEFAULT_FROM_EMAIL
+                recipient_list=['moderacao@seudominio.com'],
+                fail_silently=True,
+            )
+
+            messages.success(request, f"Sua denúncia foi enviada com sucesso! Protocolo: {denuncia.id}")
+            return redirect('denuncias:sucesso')
+        else:
+            messages.error(request, "Verifique os campos e tente novamente.")
+    else:
+        form = DenunciaForm()
+
+    return render(request, 'denuncias/form.html', {'form': form})
+
+def sucesso(request):
     return render(request, 'denuncias/sucesso.html')
 
 # ---------------------------

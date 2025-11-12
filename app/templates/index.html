@@ -25,6 +25,14 @@
         .btn-custom:hover {
             background-color: #554ff0;
         }
+        .btn-denuncia {
+            background-color: #ff4d4d;
+            color: white;
+            margin-bottom: 1.2rem;
+        }
+        .btn-denuncia:hover {
+            background-color: #e43b3b;
+        }
         #resultado {
             margin-top: 1.5rem;
             text-align: left;
@@ -50,6 +58,12 @@
 
     <div class="container text-center">
         <h2 class="mb-4">🔎 Pesquise um Golpe</h2>
+
+        <!-- 🔴 Botão para o formulário de denúncia -->
+        <a href="{% url 'fazer_denuncia' %}" class="btn-denuncia-fixa" title="Denunciar golpe">
+            🚨
+        </a>
+
         <form id="formPesquisa">
             <input type="text" id="campoPesquisa" class="form-control mb-3" placeholder="Exemplo: golpe do pix, golpe do whatsapp...">
             <button type="submit" class="btn btn-custom w-100">Pesquisar</button>

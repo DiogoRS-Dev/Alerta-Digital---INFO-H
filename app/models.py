@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 from django.utils import timezone
 
 
@@ -38,13 +39,32 @@ class Mensagem(models.Model):
         return self.mensagem
 
 
+def upload_path(instance, filename):
+    return f"denuncias/{instance.id}/{filename}"
+
 class Denuncia(models.Model):
-    mensagem = models.CharField(max_length=45)
-    data_hora = models.DateTimeField(default=timezone.now)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    CATEGORIAS = [
+        ('abuso', 'Abuso / Assédio'),
+        ('conteudo_ilegal', 'Conteúdo ilegal'),
+        ('spam', 'Spam'),
+        ('fraude', 'Fraude'),
+        ('outro', 'Outro'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    categoria = models.CharField(max_length=50, choices=CATEGORIAS, default='Outro')
+    descricao = models.TextField(default='')
+    email = models.EmailField(blank=True, null=True)
+    anexo = models.FileField(upload_to=upload_path, blank=True, null=True)
+    status = models.CharField(max_length=20, default='pendente')
 
     def __str__(self):
-        return f"Denúncia {self.id} - {self.mensagem}"
+        return f"{self.id} - {self.categoria}"
+
+    class Meta:
+        verbose_name = "Denúncia"
+        verbose_name_plural = "Denúncias"
 
 
 class Pergunta(models.Model):

@@ -1,0 +1,27 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Enviar Denúncia</title>
+  <link rel="stylesheet" href="{% static 'denuncias/style.css' %}">
+</head>
+<body>
+  <div class="container">
+    <h1>Formulário de Denúncia</h1>
+    {% if messages %}
+      <ul class="messages">
+        {% for msg in messages %}
+          <li class="{{ msg.tags }}">{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+</body>
+</html>
