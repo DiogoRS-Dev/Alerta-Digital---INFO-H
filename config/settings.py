@@ -52,7 +52,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Alerta-Digital---INFO-H',
+        'NAME': 'Alerta-Digital---INFO-H2',
         'USER': 'postgres',
         'PASSWORD': '123456',
         'HOST': 'localhost',

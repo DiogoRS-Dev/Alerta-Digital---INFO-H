@@ -44,23 +44,27 @@ def upload_path(instance, filename):
 
 class Denuncia(models.Model):
     CATEGORIAS = [
-        ('abuso', 'Abuso / Assédio'),
-        ('conteudo_ilegal', 'Conteúdo ilegal'),
-        ('spam', 'Spam'),
-        ('fraude', 'Fraude'),
+        ('golpe_pix', 'Golpe do Pix'),
+        ('phishing', 'Phishing / Falso Link'),
+        ('falso_suporte', 'Falso Suporte Técnico'),
+        ('roubo_conta', 'Roubo de Conta / Clonagem'),
+        ('site_falso', 'Site Falso / Loja Fake'),
+        ('falso_premio', 'Golpe do Prêmio / Sorteio Falso'),
+        ('engenharia_social', 'Engenharia Social'),
         ('outro', 'Outro'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     criado_em = models.DateTimeField(auto_now_add=True)
-    categoria = models.CharField(max_length=50, choices=CATEGORIAS, default='Outro')
+    categoria = models.CharField(max_length=50, choices=CATEGORIAS, default='outro')
     descricao = models.TextField(default='')
     email = models.EmailField(blank=True, null=True)
     anexo = models.FileField(upload_to=upload_path, blank=True, null=True)
     status = models.CharField(max_length=20, default='pendente')
 
     def __str__(self):
-        return f"{self.id} - {self.categoria}"
+        return f"{self.id} - {self.get_categoria_display()}"
+
 
     class Meta:
         verbose_name = "Denúncia"
