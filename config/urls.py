@@ -3,6 +3,7 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
+from app import views
 from app.views import (
     IndexView,
     # Usuário
@@ -16,12 +17,12 @@ from app.views import (
     # Denúncia
     DenunciaListView, DenunciaCreateView, fazer_denuncia, denuncia_sucesso,
     # Pergunta
-    PerguntaListView, PerguntaCreateView,
-    # Quiz
-    QuizListView, QuizCreateView,
-    # QuizPergunta
-    QuizPerguntaListView, QuizPerguntaCreateView,
-    # Golpes
+    # ----PerguntaListView, PerguntaCreateView,
+    # ----# Quiz
+    # ----QuizListView, QuizCreateView,
+    # ----# QuizPergunta
+    # ----QuizPerguntaListView, QuizPerguntaCreateView,
+    # ----Golpes
     GolpeView
 )
 
@@ -39,6 +40,10 @@ urlpatterns = [
     path("usuarios/novo/", UsuarioCreateView.as_view(), name="usuario_create"),
     path("usuarios/<int:pk>/editar/", UsuarioUpdateView.as_view(), name="usuario_update"),
     path("usuarios/<int:pk>/deletar/", UsuarioDeleteView.as_view(), name="usuario_delete"),
+    path('cadastro/', views.cadastro, name='cadastro'),
+    path('login/', views.login_view, name='login'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('logout/', views.logout_view, name='logout'),
 
     # Administradores
     path("administradores/", AdministradorListView.as_view(), name="administrador_list"),
@@ -60,21 +65,25 @@ urlpatterns = [
     path('denunciar/', fazer_denuncia, name='fazer_denuncia'),
     path('denuncia/sucesso/', denuncia_sucesso, name='denuncia_sucesso'),
 
-    # Perguntas
-    path("perguntas/", PerguntaListView.as_view(), name="pergunta_list"),
-    path("perguntas/nova/", PerguntaCreateView.as_view(), name="pergunta_create"),
+    # ----# Perguntas
+    # ----path("perguntas/", PerguntaListView.as_view(), name="pergunta_list"),
+    # ----path("perguntas/nova/", PerguntaCreateView.as_view(), name="pergunta_create"),
 
-    # Quizzes
-    path("quizzes/", QuizListView.as_view(), name="quiz_list"),
-    path("quizzes/novo/", QuizCreateView.as_view(), name="quiz_create"),
+    # ----# Quizzes
+    # ----path("quizzes/", QuizListView.as_view(), name="quiz_list"),
+    # path("quizzes/novo/", QuizCreateView.as_view(), name="quiz_create"),
 
-    # QuizPergunta
-    path("quiz-perguntas/", QuizPerguntaListView.as_view(), name="quiz_pergunta_list"),
-    path("quiz-perguntas/nova/", QuizPerguntaCreateView.as_view(), name="quiz_pergunta_create"),
+    # ----# QuizPergunta
+    # ----path("quiz-perguntas/", QuizPerguntaListView.as_view(), name="quiz_pergunta_list"),
+    # ----path("quiz-perguntas/nova/", QuizPerguntaCreateView.as_view(), name="quiz_pergunta_create"),
 
     # Páginas de golpes
     path("tipos_golpes/<str:golpe_nome>/", GolpeView.as_view(), name="golpe_detail"),
+
+    path("chat/", views.chat_view, name="chat"),
+    path("chat/responder/<int:mensagem_id>/", views.chat_responder, name="chat_responder"),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

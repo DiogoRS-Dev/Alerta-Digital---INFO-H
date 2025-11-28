@@ -49,14 +49,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'Alerta-Digital---INFO-H2',
+#         'USER': 'postgres',
+#         'PASSWORD': '123456',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Alerta-Digital---INFO-H2',
-        'USER': 'postgres',
-        'PASSWORD': '123456',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': "db.sqlite3",
     }
 }
 
@@ -108,3 +115,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # apenas para 
 # Segurança e privacidade
 CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
+LOGIN_URL = '/admin/login/'

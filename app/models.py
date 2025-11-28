@@ -30,70 +30,43 @@ class Acesso(models.Model):
         return f"{self.usuario.nome} entrou em {self.data_hora}"
 
 
+# ---------------------------------------------------------
+# MODELO ANTIGO (mantido por causa do admin)
+# ---------------------------------------------------------
 class Mensagem(models.Model):
-    mensagem = models.TextField()
-    data_hora = models.DateTimeField(default=timezone.now)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.mensagem
-
-
-def upload_path(instance, filename):
-    return f"denuncias/{instance.id}/{filename}"
-
-class Denuncia(models.Model):
-    CATEGORIAS = [
-        ('golpe_pix', 'Golpe do Pix'),
-        ('phishing', 'Phishing / Falso Link'),
-        ('falso_suporte', 'Falso Suporte Técnico'),
-        ('roubo_conta', 'Roubo de Conta / Clonagem'),
-        ('site_falso', 'Site Falso / Loja Fake'),
-        ('falso_premio', 'Golpe do Prêmio / Sorteio Falso'),
-        ('engenharia_social', 'Engenharia Social'),
-        ('outro', 'Outro'),
-    ]
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    apelido = models.CharField(max_length=50)
+    texto = models.TextField()
     criado_em = models.DateTimeField(auto_now_add=True)
-    categoria = models.CharField(max_length=50, choices=CATEGORIAS, default='outro')
-    descricao = models.TextField(default='')
-    email = models.EmailField(blank=True, null=True)
-    anexo = models.FileField(upload_to=upload_path, blank=True, null=True)
-    status = models.CharField(max_length=20, default='pendente')
+    pai = models.ForeignKey('self', null=True, blank=True, related_name='respostas', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.id} - {self.get_categoria_display()}"
+        return f"{self.apelido} - {self.texto[:30]}"
 
+
+# ---------------------------------------------------------
+# NOVO SISTEMA DE CHAT (usado no front)
+# ---------------------------------------------------------
+class ChatMensagem(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    apelido = models.CharField(max_length=50)
+    texto = models.TextField()
+    criado_em = models.DateTimeField(auto_now_add=True)
+    pai = models.ForeignKey('self', null=True, blank=True, related_name='respostas', on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = "Denúncia"
-        verbose_name_plural = "Denúncias"
-
-
-class Pergunta(models.Model):
-    pergunta = models.CharField(max_length=45)
-    nivel = models.IntegerField()
+        ordering = ['-criado_em']
 
     def __str__(self):
-        return self.pergunta
+        return f"{self.apelido}: {self.texto[:40]}"
 
-
-class Quiz(models.Model):
-    nota = models.FloatField()
-    data_hora = models.DateTimeField(default=timezone.now)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    perguntas = models.ManyToManyField(Pergunta, through="QuizPergunta")
-
-    def __str__(self):
-        return f"Quiz {self.id} - Nota: {self.nota}"
-
-
-class QuizPergunta(models.Model):
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    pergunta = models.ForeignKey(Pergunta, on_delete=models.CASCADE)
+# Temporário    
+class Denuncia(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, null=True, blank=True)
+    apelido = models.CharField(max_length=50)
+    texto = models.TextField()
+    data = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Quiz {self.quiz.id} - Pergunta {self.pergunta.id}"
-    
+        return f"Denúncia de {self.apelido}"
+

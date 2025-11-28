@@ -4,12 +4,14 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.core.mail import send_mail
-from .models import Usuario, Administrador, Acesso, Mensagem, Denuncia, Pergunta, Quiz, QuizPergunta
+from .models import Usuario, Administrador, Acesso, Mensagem, Denuncia, ChatMensagem
 from .forms import (
     UsuarioForm, AdministradorForm, AcessoForm, MensagemForm,
-    DenunciaForm, PerguntaForm, QuizForm, QuizPerguntaForm
+    DenunciaForm, PerguntaForm, QuizForm, QuizPerguntaForm, LoginForm
 )
 from django.contrib.auth.decorators import login_required
+# from .models import Pergunta, Quiz, QuizPergunta
+
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
@@ -20,6 +22,55 @@ class IndexView(View):
 # ---------------------------
 # USUÁRIO
 # ---------------------------
+def cadastro(request):
+    if request.method == 'POST':
+        form = UsuarioForm(request.POST)
+        if form.is_valid():
+            usuario = form.save(commit=False)
+            usuario.senha = form.cleaned_data['senha']  # pode criptografar depois
+            usuario.save()
+            messages.success(request, "Cadastro realizado com sucesso!")
+            return redirect('login')
+    else:
+        form = UsuarioForm()
+
+    return render(request, 'cadastro.html', { 'form': form })
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            senha = form.cleaned_data['senha']
+
+            try:
+                usuario = Usuario.objects.get(email=email, senha=senha)
+                request.session['usuario_id'] = usuario.id   # login manual
+                messages.success(request, "Login realizado!")
+                return redirect('dashboard')
+            except Usuario.DoesNotExist:
+                messages.error(request, "Email ou senha incorretos.")
+
+    else:
+        form = LoginForm()
+
+    return render(request, 'login.html', { 'form': form })
+
+
+def dashboard(request):
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+
+    usuario = Usuario.objects.get(id=request.session['usuario_id'])
+    return render(request, 'dashboard.html', { 'usuario': usuario })
+
+
+def logout_view(request):
+    request.session.flush()
+    return redirect('login')
+
 class UsuarioListView(ListView):
     model = Usuario
     template_name = "usuarios/list.html"
@@ -128,95 +179,69 @@ class DenunciaCreateView(CreateView):
     template_name = "denuncias/form.html"
     success_url = reverse_lazy("denuncia_list")
 
-@login_required
 def fazer_denuncia(request):
     if request.method == 'POST':
-        form = DenunciaForm(request.POST)
+        form = DenunciaForm(request.POST, request.FILES)
+
         if form.is_valid():
-            denuncia = form.save(commit=False)
-            denuncia.usuario = request.user  # Associa ao usuário logado
-            denuncia.save()
+            denuncia = form.save()
             return redirect('denuncia_sucesso')
+        else:
+            print(form.errors)  # DEBUG
     else:
         form = DenunciaForm()
+
     return render(request, 'denuncias/form.html', {'form': form})
 
 def denuncia_sucesso(request):
     return render(request, 'denuncias/sucesso.html')
 
-def enviar_denuncia(request):
-    if request.method == 'POST':
-        form = DenunciaForm(request.POST, request.FILES)
-        if form.is_valid():
-            denuncia = form.save()
-
-            # Envia notificação por email (ajuste conforme settings)
-            send_mail(
-                subject=f"Nova denúncia - {denuncia.categoria}",
-                message=f"ID: {denuncia.id}\nCategoria: {denuncia.categoria}\nDescrição: {denuncia.descricao}\nEmail: {denuncia.email or 'não informado'}",
-                from_email=None,  # usa DEFAULT_FROM_EMAIL
-                recipient_list=['moderacao@seudominio.com'],
-                fail_silently=True,
-            )
-
-            messages.success(request, f"Sua denúncia foi enviada com sucesso! Protocolo: {denuncia.id}")
-            return redirect('denuncias:sucesso')
-        else:
-            messages.error(request, "Verifique os campos e tente novamente.")
-    else:
-        form = DenunciaForm()
-
-    return render(request, 'denuncias/form.html', {'form': form})
-
-def sucesso(request):
-    return render(request, 'denuncias/sucesso.html')
-
 # ---------------------------
 # PERGUNTA
 # ---------------------------
-class PerguntaListView(ListView):
-    model = Pergunta
-    template_name = "perguntas/list.html"
-    context_object_name = "perguntas"
+# class PerguntaListView(ListView):
+#     model = Pergunta
+#     template_name = "perguntas/list.html"
+#     context_object_name = "perguntas"
 
 
-class PerguntaCreateView(CreateView):
-    model = Pergunta
-    form_class = PerguntaForm
-    template_name = "perguntas/form.html"
-    success_url = reverse_lazy("pergunta_list")
+# class PerguntaCreateView(CreateView):
+#     model = Pergunta
+#     form_class = PerguntaForm
+#     template_name = "perguntas/form.html"
+#     success_url = reverse_lazy("pergunta_list")
 
 
-# ---------------------------
-# QUIZ
-# ---------------------------
-class QuizListView(ListView):
-    model = Quiz
-    template_name = "quizzes/list.html"
-    context_object_name = "quizzes"
+# # ---------------------------
+# # QUIZ
+# # ---------------------------
+# class QuizListView(ListView):
+#     model = Quiz
+#     template_name = "quizzes/list.html"
+#     context_object_name = "quizzes"
 
 
-class QuizCreateView(CreateView):
-    model = Quiz
-    form_class = QuizForm
-    template_name = "quizzes/form.html"
-    success_url = reverse_lazy("quiz_list")
+# class QuizCreateView(CreateView):
+#     model = Quiz
+#     form_class = QuizForm
+#     template_name = "quizzes/form.html"
+#     success_url = reverse_lazy("quiz_list")
 
 
-# ---------------------------
-# QUIZ-PERGUNTA
-# ---------------------------
-class QuizPerguntaListView(ListView):
-    model = QuizPergunta
-    template_name = "quiz_perguntas/list.html"
-    context_object_name = "quiz_perguntas"
+# # ---------------------------
+# # QUIZ-PERGUNTA
+# # ---------------------------
+# class QuizPerguntaListView(ListView):
+#     model = QuizPergunta
+#     template_name = "quiz_perguntas/list.html"
+#     context_object_name = "quiz_perguntas"
 
 
-class QuizPerguntaCreateView(CreateView):
-    model = QuizPergunta
-    form_class = QuizPerguntaForm
-    template_name = "quiz_perguntas/form.html"
-    success_url = reverse_lazy("quiz_pergunta_list")
+# class QuizPerguntaCreateView(CreateView):
+#     model = QuizPergunta
+#     form_class = QuizPerguntaForm
+#     template_name = "quiz_perguntas/form.html"
+#     success_url = reverse_lazy("quiz_pergunta_list")
 
 
 # ---------------------------
@@ -227,3 +252,56 @@ class GolpeView(View):
         template_name = f"tipos_golpes/{golpe_nome}.html"
         return render(request, template_name)
 
+
+
+def get_usuario_logado(request):
+    """Retorna o objeto Usuario baseado na sessão manual."""
+    if 'usuario_id' in request.session:
+        return Usuario.objects.get(id=request.session['usuario_id'])
+    return None
+
+
+def chat_view(request):
+    usuario = get_usuario_logado(request)
+
+    mensagens = ChatMensagem.objects.filter(pai__isnull=True)
+
+    if request.method == "POST":
+        if not usuario:
+            messages.error(request, "Você precisa estar logado para comentar.")
+            return redirect("login")
+
+        texto = request.POST.get("texto")
+        apelido = request.POST.get("apelido")
+
+        ChatMensagem.objects.create(
+            usuario=usuario,
+            apelido=apelido,
+            texto=texto
+        )
+
+        return redirect("chat")
+
+    return render(request, "chat/chat.html", {
+        "mensagens": mensagens,
+        "usuario": usuario
+    })
+
+
+def chat_responder(request, mensagem_id):
+    usuario = get_usuario_logado(request)
+
+    pai = ChatMensagem.objects.get(id=mensagem_id)
+
+    if request.method == "POST":
+        texto = request.POST.get("texto")
+        apelido = request.POST.get("apelido")
+
+        ChatMensagem.objects.create(
+            usuario=usuario,
+            apelido=apelido,
+            texto=texto,
+            pai=pai
+        )
+
+    return redirect("chat")
