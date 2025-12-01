@@ -10,7 +10,7 @@ from .forms import (
     DenunciaForm, PerguntaForm, QuizForm, QuizPerguntaForm, LoginForm
 )
 from django.contrib.auth.decorators import login_required
-# from .models import Pergunta, Quiz, QuizPergunta
+from .models import Pergunta, Quiz, QuizPergunta
 
 
 class IndexView(View):
@@ -199,49 +199,49 @@ def denuncia_sucesso(request):
 # ---------------------------
 # PERGUNTA
 # ---------------------------
-# class PerguntaListView(ListView):
-#     model = Pergunta
-#     template_name = "perguntas/list.html"
-#     context_object_name = "perguntas"
+class PerguntaListView(ListView):
+    model = Pergunta
+    template_name = "perguntas/list.html"
+    context_object_name = "perguntas"
 
 
-# class PerguntaCreateView(CreateView):
-#     model = Pergunta
-#     form_class = PerguntaForm
-#     template_name = "perguntas/form.html"
-#     success_url = reverse_lazy("pergunta_list")
+class PerguntaCreateView(CreateView):
+    model = Pergunta
+    form_class = PerguntaForm
+    template_name = "perguntas/form.html"
+    success_url = reverse_lazy("pergunta_list")
 
 
-# # ---------------------------
-# # QUIZ
-# # ---------------------------
-# class QuizListView(ListView):
-#     model = Quiz
-#     template_name = "quizzes/list.html"
-#     context_object_name = "quizzes"
+# ---------------------------
+# QUIZ
+# ---------------------------
+class QuizListView(ListView):
+    model = Quiz
+    template_name = "quizzes/list.html"
+    context_object_name = "quizzes"
 
 
-# class QuizCreateView(CreateView):
-#     model = Quiz
-#     form_class = QuizForm
-#     template_name = "quizzes/form.html"
-#     success_url = reverse_lazy("quiz_list")
+class QuizCreateView(CreateView):
+    model = Quiz
+    form_class = QuizForm
+    template_name = "quizzes/form.html"
+    success_url = reverse_lazy("quiz_list")
 
 
-# # ---------------------------
-# # QUIZ-PERGUNTA
-# # ---------------------------
-# class QuizPerguntaListView(ListView):
-#     model = QuizPergunta
-#     template_name = "quiz_perguntas/list.html"
-#     context_object_name = "quiz_perguntas"
+# ---------------------------
+# QUIZ-PERGUNTA
+# ---------------------------
+class QuizPerguntaListView(ListView):
+    model = QuizPergunta
+    template_name = "quiz_perguntas/list.html"
+    context_object_name = "quiz_perguntas"
 
 
-# class QuizPerguntaCreateView(CreateView):
-#     model = QuizPergunta
-#     form_class = QuizPerguntaForm
-#     template_name = "quiz_perguntas/form.html"
-#     success_url = reverse_lazy("quiz_pergunta_list")
+class QuizPerguntaCreateView(CreateView):
+    model = QuizPergunta
+    form_class = QuizPerguntaForm
+    template_name = "quiz_perguntas/form.html"
+    success_url = reverse_lazy("quiz_pergunta_list")
 
 
 # ---------------------------

@@ -1,6 +1,6 @@
 from django import forms
 from .models import Usuario, Administrador, Acesso, Mensagem, Denuncia
-# from .models import Pergunta, Quiz, QuizPergunta
+from .models import Pergunta, Quiz, QuizPergunta
 
 class UsuarioForm(forms.ModelForm):
     senha = forms.CharField(widget=forms.PasswordInput)
@@ -39,7 +39,7 @@ class AcessoForm(forms.ModelForm):
 class MensagemForm(forms.ModelForm):
     class Meta:
         model = Mensagem
-        fields = ["mensagem", "data_hora", "usuario"]
+        fields = ["usuario", "apelido", "texto"]
 
 
 class DenunciaForm(forms.ModelForm):
@@ -53,34 +53,34 @@ class DenunciaForm(forms.ModelForm):
         fields = ['categoria', 'descricao', 'email', 'anexo']  # REMOVER consentimento
 
 
-# class PerguntaForm(forms.ModelForm):
-#     class Meta:
-#         model = Pergunta
-#         fields = ["pergunta", "nivel"]
+class PerguntaForm(forms.ModelForm):
+    class Meta:
+        model = Pergunta
+        fields = ["pergunta", "nivel"]
 
-#     def clean_nivel(self):
-#         nivel = self.cleaned_data["nivel"]
-#         if nivel < 1:
-#             raise forms.ValidationError("O nível deve ser maior que 0.")
-#         return nivel
-
-
-# class QuizForm(forms.ModelForm):
-#     class Meta:
-#         model = Quiz
-#         fields = ["nota", "data_hora", "usuario", "perguntas"]
-
-#     def clean_nota(self):
-#         nota = self.cleaned_data["nota"]
-#         if nota < 0:
-#             raise forms.ValidationError("A nota não pode ser negativa.")
-#         return nota
+    def clean_nivel(self):
+        nivel = self.cleaned_data["nivel"]
+        if nivel < 1:
+            raise forms.ValidationError("O nível deve ser maior que 0.")
+        return nivel
 
 
-# class QuizPerguntaForm(forms.ModelForm):
-#     class Meta:
-#         model = QuizPergunta
-#         fields = ["quiz", "usuario", "pergunta"]
+class QuizForm(forms.ModelForm):
+    class Meta:
+        model = Quiz
+        fields = ["nota", "data_hora", "usuario", "perguntas"]
+
+    def clean_nota(self):
+        nota = self.cleaned_data["nota"]
+        if nota < 0:
+            raise forms.ValidationError("A nota não pode ser negativa.")
+        return nota
+
+
+class QuizPerguntaForm(forms.ModelForm):
+    class Meta:
+        model = QuizPergunta
+        fields = ["quiz", "usuario", "pergunta"]
         
 
 

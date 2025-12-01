@@ -17,12 +17,12 @@ from app.views import (
     # Denúncia
     DenunciaListView, DenunciaCreateView, fazer_denuncia, denuncia_sucesso,
     # Pergunta
-    # ----PerguntaListView, PerguntaCreateView,
-    # ----# Quiz
-    # ----QuizListView, QuizCreateView,
-    # ----# QuizPergunta
-    # ----QuizPerguntaListView, QuizPerguntaCreateView,
-    # ----Golpes
+    PerguntaListView, PerguntaCreateView,
+    # Quiz
+    QuizListView, QuizCreateView,
+    # QuizPergunta
+    QuizPerguntaListView, QuizPerguntaCreateView,
+    # Golpes
     GolpeView
 )
 
@@ -65,17 +65,17 @@ urlpatterns = [
     path('denunciar/', fazer_denuncia, name='fazer_denuncia'),
     path('denuncia/sucesso/', denuncia_sucesso, name='denuncia_sucesso'),
 
-    # ----# Perguntas
-    # ----path("perguntas/", PerguntaListView.as_view(), name="pergunta_list"),
-    # ----path("perguntas/nova/", PerguntaCreateView.as_view(), name="pergunta_create"),
+    # Perguntas
+    path("perguntas/", PerguntaListView.as_view(), name="pergunta_list"),
+    path("perguntas/nova/", PerguntaCreateView.as_view(), name="pergunta_create"),
 
-    # ----# Quizzes
-    # ----path("quizzes/", QuizListView.as_view(), name="quiz_list"),
-    # path("quizzes/novo/", QuizCreateView.as_view(), name="quiz_create"),
+    # Quizzes
+    path("quizzes/", QuizListView.as_view(), name="quiz_list"),
+    path("quizzes/novo/", QuizCreateView.as_view(), name="quiz_create"),
 
-    # ----# QuizPergunta
-    # ----path("quiz-perguntas/", QuizPerguntaListView.as_view(), name="quiz_pergunta_list"),
-    # ----path("quiz-perguntas/nova/", QuizPerguntaCreateView.as_view(), name="quiz_pergunta_create"),
+    # QuizPergunta
+    path("quiz-perguntas/", QuizPerguntaListView.as_view(), name="quiz_pergunta_list"),
+    path("quiz-perguntas/nova/", QuizPerguntaCreateView.as_view(), name="quiz_pergunta_create"),
 
     # Páginas de golpes
     path("tipos_golpes/<str:golpe_nome>/", GolpeView.as_view(), name="golpe_detail"),
