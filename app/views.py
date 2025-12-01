@@ -4,13 +4,16 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.core.mail import send_mail
+from django.utils import timezone
 from .models import Usuario, Administrador, Acesso, Mensagem, Denuncia, ChatMensagem
 from .forms import (
     UsuarioForm, AdministradorForm, AcessoForm, MensagemForm,
     DenunciaForm, PerguntaForm, QuizForm, QuizPerguntaForm, LoginForm
 )
 from django.contrib.auth.decorators import login_required
-from .models import Pergunta, Quiz, QuizPergunta
+from .models import Pergunta, Quiz, QuizPergunta, Usuario, Alternativa
+import random
+import random
 
 
 class IndexView(View):
@@ -18,6 +21,11 @@ class IndexView(View):
         return render(request, 'index.html')
     def post(self, request):
         pass
+
+class PrincipalView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'Principal.html')
+
     
 # ---------------------------
 # USUÁRIO
@@ -226,6 +234,131 @@ class QuizCreateView(CreateView):
     form_class = QuizForm
     template_name = "quizzes/form.html"
     success_url = reverse_lazy("quiz_list")
+
+def quiz_inicio(request):
+    # buscar todas as perguntas ativas
+    perguntas_qs = list(Pergunta.objects.all().values_list('id', flat=True))
+    if not perguntas_qs:
+        # sem perguntas
+        return render(request, 'quiz/sem_perguntas.html')
+
+    # embaralhar (opcional)
+    random.shuffle(perguntas_qs)
+
+    # guardar na sessão
+    request.session['quiz_perguntas'] = perguntas_qs
+    request.session['quiz_index'] = 0
+    request.session['quiz_score'] = 0
+    request.session.modified = True
+
+    # redireciona para a primeira pergunta
+    return redirect('quiz_pergunta', pergunta_id=perguntas_qs[0])
+
+
+# Mostrar/Processar uma pergunta
+def quiz_pergunta(request, pergunta_id):
+    # carregar sessão
+    perguntas = request.session.get('quiz_perguntas')
+    index = request.session.get('quiz_index', 0)
+    score = request.session.get('quiz_score', 0)
+
+    if not perguntas:
+        return redirect('quiz_inicio')  # sessão inválida
+
+    # garantir que a pergunta atual bate com o índice (evita acesso direto fora de ordem)
+    try:
+        pergunta_atual_id = perguntas[index]
+    except IndexError:
+        return redirect('quiz_fim')
+
+    if int(pergunta_id) != int(pergunta_atual_id):
+        # redireciona para a pergunta correta
+        return redirect('quiz_pergunta', pergunta_id=pergunta_atual_id)
+
+    pergunta = get_object_or_404(Pergunta, id=pergunta_id)
+    alternativas = list(pergunta.alternativas.all())
+
+    # embaralhar alternativas para que ordem mude
+    random.shuffle(alternativas)
+
+    if request.method == 'POST':
+        escolha_id = request.POST.get('alternativa')
+        if not escolha_id:
+            # nenhum valor escolhido — volte mostrando erro simples
+            return render(request, 'quiz/quiz_pergunta.html', {
+                'pergunta': pergunta,
+                'alternativas': alternativas,
+                'erro': 'Selecione uma alternativa antes de enviar.'
+            })
+
+        # validar a alternativa
+        try:
+            escolha = Alternativa.objects.get(id=escolha_id, pergunta=pergunta)
+        except Alternativa.DoesNotExist:
+            return render(request, 'quiz/quiz_pergunta.html', {
+                'pergunta': pergunta,
+                'alternativas': alternativas,
+                'erro': 'Alternativa inválida.'
+            })
+
+        # atualizar pontuação
+        if escolha.correta:
+            score += 1
+            request.session['quiz_score'] = score
+
+        # avançar índice
+        request.session['quiz_index'] = index + 1
+        request.session.modified = True
+
+        # se acabou
+        if request.session['quiz_index'] >= len(perguntas):
+            return redirect('quiz_fim')
+
+        # senão, ir para próxima pergunta
+        proxima_id = perguntas[request.session['quiz_index']]
+        return redirect('quiz_pergunta', pergunta_id=proxima_id)
+
+    # GET — renderiza pergunta
+    return render(request, 'quiz/quiz_pergunta.html', {
+        'pergunta': pergunta,
+        'alternativas': alternativas,
+        'index': index,
+        'total': len(perguntas)
+    })
+
+
+# Tela final — exibe resultado e salva no banco se possível
+def quiz_fim(request):
+    score = request.session.get('quiz_score', 0)
+    perguntas = request.session.get('quiz_perguntas', [])
+    total = len(perguntas)
+
+    # salvar resultado se usuário estiver logado via sessão manual
+    usuario_obj = None
+    if 'usuario_id' in request.session:
+        try:
+            usuario_obj = Usuario.objects.get(id=request.session['usuario_id'])
+        except Usuario.DoesNotExist:
+            usuario_obj = None
+
+    if usuario_obj:
+        # criar Quiz
+        quiz = Quiz.objects.create(nota=score, usuario=usuario_obj, data_hora=timezone.now())
+
+        # criar entradas QuizPergunta (registro do quiz)
+        for pid in perguntas:
+            QuizPergunta.objects.create(quiz=quiz, usuario=usuario_obj, pergunta_id=pid)
+
+    # limpar sessão relacionada ao quiz (opcional)
+    request.session.pop('quiz_perguntas', None)
+    request.session.pop('quiz_index', None)
+    request.session.pop('quiz_score', None)
+
+    return render(request, 'quiz/quiz_fim.html', {
+        'score': score,
+        'total': total,
+        'salvo': bool(usuario_obj)
+    })
 
 
 # ---------------------------

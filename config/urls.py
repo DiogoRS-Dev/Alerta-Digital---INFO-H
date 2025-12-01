@@ -3,6 +3,7 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 from app import views
 from app.views import (
     IndexView,
@@ -33,6 +34,8 @@ urlpatterns = [
 
     # Página inicial
     path('', IndexView.as_view(), name='index'),
+    path('principal/', views.PrincipalView.as_view(), name='Principal'),
+
 
     # Usuários
     path("usuarios/", UsuarioListView.as_view(), name="usuario_list"),
@@ -72,6 +75,9 @@ urlpatterns = [
     # Quizzes
     path("quizzes/", QuizListView.as_view(), name="quiz_list"),
     path("quizzes/novo/", QuizCreateView.as_view(), name="quiz_create"),
+    path('quiz/', views.quiz_inicio, name='quiz_inicio'),
+    path('quiz/<int:pergunta_id>/', views.quiz_pergunta, name='quiz_pergunta'),
+    path('quiz/fim/', views.quiz_fim, name='quiz_fim'),
 
     # QuizPergunta
     path("quiz-perguntas/", QuizPerguntaListView.as_view(), name="quiz_pergunta_list"),

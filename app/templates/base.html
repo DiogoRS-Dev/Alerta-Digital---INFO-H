@@ -3,20 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Sistema{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>{% block title %}Alerta Digital{% endblock %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link 
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+        rel="stylesheet"
+    >
+
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+        }
+
+        footer {
+            background: #0d6efd;
+            color: white;
+            padding: 15px 0;
+            margin-top: 50px;
+        }
+    </style>
+
+    {% block head %}{% endblock %}
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="/">Sistema</a>
-        </div>
-    </nav>
+<body>
 
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
-        {% block content %}{% endblock %}
-    </div>
+        <a class="navbar-brand" href="{% url 'index' %}">Alerta Digital</a>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+
+                <!-- Página inicial -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'index' %}">Início</a>
+                </li>
+
+                <!-- Denunciar -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'fazer_denuncia' %}">Denunciar</a>
+                </li>
+
+                <!-- Quiz -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'quiz_inicio' %}">Quiz</a>
+                </li>
+
+                <!-- Se NÃO estiver logado -->
+                {% if not request.session.usuario_id %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'cadastro' %}">Cadastro</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+                {% endif %}
+
+                <!-- Se estiver logado -->
+                {% if request.session.usuario_id %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Sair</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- BLOCO DE CONTEÚDO -->
+<main class="container my-5">
+    {% block content %}
+    {% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container text-center">
+        <p class="mb-0">© {{ now|date:"Y" }} Alerta Digital — Todos os direitos reservados.</p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script 
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+</script>
+
+{% block scripts %}{% endblock %}
+
 </body>
 </html>

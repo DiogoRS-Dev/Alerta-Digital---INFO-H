@@ -40,7 +40,7 @@ class Acesso(models.Model):
 
 class Mensagem(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    apelido = models.CharField(max_length=50)
+    apelido = models.CharField(max_length=100, null=True, blank=True)
     texto = models.TextField()
     criado_em = models.DateTimeField(auto_now_add=True)
     pai = models.ForeignKey(
@@ -144,3 +144,11 @@ class QuizPergunta(models.Model):
 
     def __str__(self):
         return f"Quiz {self.quiz.id} - Pergunta {self.pergunta.id}"
+
+class Alternativa(models.Model):
+    pergunta = models.ForeignKey(Pergunta, on_delete=models.CASCADE, related_name="alternativas")
+    texto = models.CharField(max_length=200)
+    correta = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.texto} ({'Correta' if self.correta else 'Errada'})"

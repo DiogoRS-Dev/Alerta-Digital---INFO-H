@@ -7,68 +7,89 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f5f3fa;
-            font-family: "Segoe UI", sans-serif;
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+    background: linear-gradient(135deg, #1d1d25, #3d4697);
+    min-height: 100vh;
+    color: white;
+    overflow-x: hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
         }
         .container {
-            max-width: 600px;
-            margin-top: 10%;
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 0 12px rgba(0,0,0,0.1);
-            padding: 2rem;
-        }
-        .btn-custom {
-            background-color: #6c63ff;
-            color: white;
-        }
-        .btn-custom:hover {
-            background-color: #554ff0;
-        }
-        .btn-denuncia {
-            background-color: #ff4d4d;
-            color: white;
-            margin-bottom: 1.2rem;
-        }
-        .btn-denuncia:hover {
-            background-color: #e43b3b;
-        }
-        #resultado {
-            margin-top: 1.5rem;
-            text-align: left;
-        }
-        a.result-link {
-            display: block;
-            padding: 10px;
-            margin-bottom: 10px;
-            background: #f8f8ff;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #333;
-            border: 1px solid #ddd;
-            transition: all 0.2s;
-        }
-        a.result-link:hover {
-            background-color: #ecebff;
-            border-color: #b4b2ff;
-        }
+    width: 90%;
+    max-width: 600px;
+    text-align:center;
+  }
+  .container{
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 2rem;
+      margin: auto;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  h2 {
+      color: #ff0000;
+      text-shadow: 0 0 15px red;
+      font-size:2.3rem;
+      margin-bottom: 15px;
+      font-weight:900;
+  }
+
+  .opcao {
+      display:block;
+      background: linear-gradient(45deg, #ff0000, #ff002b);
+      padding: 1rem;
+      margin: 10px 0;
+      border-radius: 25px;
+      font-size: 1.2rem;
+      font-weight:700;
+      color:#1e1f26;
+      text-decoration:none;
+      transition:.3s;
+  }
+
+  .opcao:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 35px rgba(255,0,0,.4);
+  }
+
+  .pesquisar {
+      background:rgba(255,255,255,0.15);
+      border:1px solid rgba(255,255,255,0.3);
+      color:white;
+  }
+  
+  .aviso {
+      margin-top:10px;
+      font-size:.9rem;
+      opacity:.8;
+  }
+  form{
+    text-align: center;
+  }
     </style>
 </head>
 <body>
 
-    <div class="container text-center">
+    <div class="container">
         <h2 class="mb-4">🔎 Pesquise um Golpe</h2>
 
         <!-- 🔴 Botão para o formulário de denúncia -->
         <a href="{% url 'fazer_denuncia' %}" class="btn-denuncia-fixa" title="Denunciar golpe">
             🚨
         </a>
+        <a href="{% url 'quiz_inicio' %}" class="btn">Fazer Quiz</a>
         <a href="{% url 'login' %}" class="btn btn-login">Entrar</a>
         <a href="{% url 'cadastro' %}" class="btn btn-cadastro">Criar Conta</a>
 
         <form id="formPesquisa">
             <input type="text" id="campoPesquisa" class="form-control mb-3" placeholder="Exemplo: golpe do pix, golpe do whatsapp...">
-            <button type="submit" class="btn btn-custom w-100">Pesquisar</button>
+            <button type="submit" class="pesquisar">Pesquisar</button>
         </form>
 
         <div id="resultado"></div>

@@ -1,9 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+
+<style>
+  body {
+      margin: 0;
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(135deg, #1d1d25, #3d4697);
+      min-height: 100vh;
+      color: white;
+      overflow-x: hidden;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+  }
+
+  .container {
+      width: 90%;
+      max-width: 600px;
+      text-align:center;
+  }
+
+  .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 2rem;
+      margin: auto;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  h2 {
+      color: #ff0000;
+      text-shadow: 0 0 15px red;
+      font-size:2.3rem;
+      margin-bottom: 15px;
+      font-weight:900;
+  }
+
+  .opcao {
+      display:block;
+      background: linear-gradient(45deg, #ff0000, #ff002b);
+      padding: 1rem;
+      margin: 10px 0;
+      border-radius: 25px;
+      font-size: 1.2rem;
+      font-weight:700;
+      color:#1e1f26;
+      text-decoration:none;
+      transition:.3s;
+  }
+
+  .opcao:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 35px rgba(255,0,0,.4);
+  }
+
+  .desconectado {
+      background:rgba(255,255,255,0.15);
+      border:1px solid rgba(255,255,255,0.3);
+      color:white;
+  }
+  
+  .aviso {
+      margin-top:10px;
+      font-size:.9rem;
+      opacity:.8;
+  }
+  form{
+    text-align: center;
+  }
+</style>
+
+</head>
+<body>
+
+<div class="container">
+    <div class="glass-card">
 <h2>Login</h2>
 
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Entrar</button>
+    <button class="opcao" type="submit">Entrar</button>
 </form>
 
-<a href="{% url 'cadastro' %}">Criar conta</a>
+<a class="opcao desconectado" href="{% url 'cadastro' %}">Criar conta</a>

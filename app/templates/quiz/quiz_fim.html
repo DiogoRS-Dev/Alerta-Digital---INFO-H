@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5 text-center">
+  <div class="card p-4">
+    <h2>Resultado</h2>
+    <p>Você acertou <strong>{{ score }}</strong> de <strong>{{ total }}</strong> perguntas.</p>
+    {% if salvo %}
+      <p class="text-success">Seu resultado foi salvo no sistema.</p>
+    {% else %}
+      <p class="text-muted">Crie uma conta / entre para salvar seus resultados.</p>
+    {% endif %}
+    <a class="btn btn-primary mt-3" href="{% url 'index' %}">Voltar ao início</a>
+  </div>
+</div>
+{% endblock %}
