@@ -1,5 +1,5 @@
 from django import forms
-from .models import Usuario, Administrador, Acesso, Mensagem, Denuncia
+from .models import Usuario, Administrador, Acesso, ChatMensagem, Denuncia
 from .models import Pergunta, Quiz, QuizPergunta
 
 class UsuarioForm(forms.ModelForm):
@@ -37,8 +37,9 @@ class AcessoForm(forms.ModelForm):
 
 
 class MensagemForm(forms.ModelForm):
+    # agora usa ChatMensagem
     class Meta:
-        model = Mensagem
+        model = ChatMensagem
         fields = ["usuario", "apelido", "texto"]
 
 

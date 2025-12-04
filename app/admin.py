@@ -1,5 +1,5 @@
 from django.contrib import admin # A senha do admin vai ser Pindamonhangaba.Pelotas123
-from .models import Usuario, Administrador, Acesso, Mensagem, Denuncia
+from .models import Usuario, Administrador, Acesso, Denuncia, ChatMensagem
 from .models import Pergunta, Quiz, QuizPergunta, Alternativa
 
 
@@ -19,12 +19,12 @@ class AdministradorAdmin(admin.ModelAdmin):
 class AcessoAdmin(admin.ModelAdmin):
     list_display = ("id", "usuario", "data_hora")
     search_fields = ("usuario__nome",)
+    
 
-
-@admin.register(Mensagem)
-class MensagemAdmin(admin.ModelAdmin):
-    list_display = ('id', 'apelido', 'usuario', 'criado_em')
-    search_fields = ("texto", "usuario__nome")
+@admin.register(ChatMensagem)
+class ChatMensagemAdmin(admin.ModelAdmin):
+    list_display = ("id", "apelido", "usuario", "criado_em", "pai")
+    search_fields = ("apelido", "texto", "usuario__nome")
 
 
 @admin.register(Denuncia)

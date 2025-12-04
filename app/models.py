@@ -35,33 +35,12 @@ class Acesso(models.Model):
 
 
 # ---------------------------------------------------------
-# SISTEMA ANTIGO DE MENSAGENS (mantido pelo admin)
-# ---------------------------------------------------------
-
-class Mensagem(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    apelido = models.CharField(max_length=100, null=True, blank=True)
-    texto = models.TextField()
-    criado_em = models.DateTimeField(auto_now_add=True)
-    pai = models.ForeignKey(
-        'self',
-        null=True,
-        blank=True,
-        related_name='respostas',
-        on_delete=models.CASCADE
-    )
-
-    def __str__(self):
-        return f"{self.apelido} - {self.texto[:30]}"
-
-
-# ---------------------------------------------------------
 # NOVO SISTEMA DE CHAT (usado no front)
 # ---------------------------------------------------------
 
 class ChatMensagem(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    apelido = models.CharField(max_length=50)
+    apelido = models.CharField(max_length=50, blank=True, null=True)
     texto = models.TextField()
     criado_em = models.DateTimeField(auto_now_add=True)
     pai = models.ForeignKey(

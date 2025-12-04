@@ -3,7 +3,6 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
-
 from app import views
 from app.views import (
     IndexView,
@@ -13,8 +12,8 @@ from app.views import (
     AdministradorListView, AdministradorCreateView, AdministradorUpdateView, AdministradorDeleteView,
     # Acesso
     AcessoListView, AcessoCreateView,
-    # Mensagem
-    MensagemListView, MensagemCreateView,
+    # Mensagens agora usam ChatMensagemListView / ChatMensagemCreateView
+    ChatMensagemListView, ChatMensagemCreateView,
     # Denúncia
     DenunciaListView, DenunciaCreateView, fazer_denuncia, denuncia_sucesso,
     # Pergunta
@@ -35,7 +34,6 @@ urlpatterns = [
     # Página inicial
     path('', IndexView.as_view(), name='index'),
     path('principal/', views.PrincipalView.as_view(), name='Principal'),
-
 
     # Usuários
     path("usuarios/", UsuarioListView.as_view(), name="usuario_list"),
@@ -58,9 +56,9 @@ urlpatterns = [
     path("acessos/", AcessoListView.as_view(), name="acesso_list"),
     path("acessos/novo/", AcessoCreateView.as_view(), name="acesso_create"),
 
-    # Mensagens
-    path("mensagens/", MensagemListView.as_view(), name="mensagem_list"),
-    path("mensagens/nova/", MensagemCreateView.as_view(), name="mensagem_create"),
+    # Mensagens (rotas mantidas — agora ligam às views de ChatMensagem)
+    path("mensagens/", ChatMensagemListView.as_view(), name="mensagem_list"),
+    path("mensagens/nova/", ChatMensagemCreateView.as_view(), name="mensagem_create"),
 
     # Denúncias
     path("denuncias/", DenunciaListView.as_view(), name="denuncia_list"),
@@ -86,10 +84,10 @@ urlpatterns = [
     # Páginas de golpes
     path("tipos_golpes/<str:golpe_nome>/", GolpeView.as_view(), name="golpe_detail"),
 
+    # Chat interativo (funções)
     path("chat/", views.chat_view, name="chat"),
     path("chat/responder/<int:mensagem_id>/", views.chat_responder, name="chat_responder"),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

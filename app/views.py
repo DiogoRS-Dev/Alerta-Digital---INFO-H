@@ -5,14 +5,12 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.core.mail import send_mail
 from django.utils import timezone
-from .models import Usuario, Administrador, Acesso, Mensagem, Denuncia, ChatMensagem
+from .models import Usuario, Administrador, Acesso, Denuncia, ChatMensagem, Pergunta, Quiz, QuizPergunta, Alternativa
 from .forms import (
     UsuarioForm, AdministradorForm, AcessoForm, MensagemForm,
     DenunciaForm, PerguntaForm, QuizForm, QuizPerguntaForm, LoginForm
 )
 from django.contrib.auth.decorators import login_required
-from .models import Pergunta, Quiz, QuizPergunta, Usuario, Alternativa
-import random
 import random
 
 
@@ -159,14 +157,14 @@ class AcessoCreateView(CreateView):
 # ---------------------------
 # MENSAGEM
 # ---------------------------
-class MensagemListView(ListView):
-    model = Mensagem
-    template_name = "mensagens/list.html"
+class ChatMensagemListView(ListView):
+    model = ChatMensagem
+    template_name = "mensagens/list.html"   # mantive o caminho antigo para não quebrar links; ajuste se necessário
     context_object_name = "mensagens"
 
 
-class MensagemCreateView(CreateView):
-    model = Mensagem
+class ChatMensagemCreateView(CreateView):
+    model = ChatMensagem
     form_class = MensagemForm
     template_name = "mensagens/form.html"
     success_url = reverse_lazy("mensagem_list")
@@ -394,9 +392,17 @@ def get_usuario_logado(request):
     return None
 
 
+# Funções de chat usadas pelo front (mantive as suas)
+def get_usuario_logado(request):
+    """Retorna o objeto Usuario baseado na sessão manual."""
+    if 'usuario_id' in request.session:
+        return Usuario.objects.get(id=request.session['usuario_id'])
+    return None
+
+
 def chat_view(request):
     usuario = get_usuario_logado(request)
-
+    # buscar mensagens raíz (pai is null) ordenadas (o modelo já tem ordering)
     mensagens = ChatMensagem.objects.filter(pai__isnull=True)
 
     if request.method == "POST":
@@ -424,7 +430,7 @@ def chat_view(request):
 def chat_responder(request, mensagem_id):
     usuario = get_usuario_logado(request)
 
-    pai = ChatMensagem.objects.get(id=mensagem_id)
+    pai = get_object_or_404(ChatMensagem, id=mensagem_id)
 
     if request.method == "POST":
         texto = request.POST.get("texto")

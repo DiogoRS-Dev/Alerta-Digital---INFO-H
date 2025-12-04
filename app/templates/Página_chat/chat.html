@@ -1,119 +1,230 @@
 {% load static %}
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alerta Digital — Fórum Interativo</title>
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Chat</title>
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Alpine.js -->
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.1/dist/cdn.min.js" defer></script>
+    <!-- Bootstrap 5 (supondo que você já usa) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        body {
-            background: linear-gradient(135deg, #1a1a1a, #3a3a3a);
-            min-height: 100vh;
-            color: white;
-        }
+      /* layout */
+      html, body {
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        background: #f7f7fb;
+      }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(8px);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
-        }
+      /* area de mensagens ocupa todo o espaço disponível acima do footer */
+      .chat-container {
+        flex: 1 1 auto;
+        overflow: auto;
+        padding: 1rem;
+      }
 
-        .comment-box {
-            margin-bottom: 25px;
-            padding: 20px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+      /* cartão da mensagem */
+      .mensagem-card {
+        margin-bottom: 0.75rem;
+        border-radius: 10px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      }
 
-        .reply-box {
-            margin-left: 40px;
-            background: rgba(255, 255, 255, 0.04);
-        }
+      .mensagem-topo {
+        font-weight: 600;
+      }
 
-        .reply-button {
-            cursor: pointer;
-            opacity: .7;
-        }
-        .reply-button:hover {
-            opacity: 1;
-            text-decoration: underline;
-        }
+      .mensagem-rodape {
+        font-size: 0.85rem;
+        color: #666;
+      }
+
+      /* footer fixo com formulário */
+      .chat-footer {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        border-top: 1px solid #e6e6e6;
+        padding: 0.75rem;
+        z-index: 50;
+      }
+
+      /* limitar largura das mensagens e centralizar */
+      .chat-inner {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      /* escondido inicialmente (será revelado em blocos) */
+      .mensagem-oculta {
+        display: none;
+      }
+
+      /* contador/pequena dica quando não há mensagens */
+      .sem-mensagens {
+        text-align: center;
+        color: #777;
+        margin-top: 3rem;
+      }
     </style>
-</head>
-
-<body>
-
-<div class="container py-4" x-data="{ openReply: null }">
-
-    <h2 class="text-center mb-4">Comentários</h2>
-
-    <!-- FORM PRINCIPAL -->
-    <div class="glass-card mb-4">
-        <form method="POST" class="row g-3">
-            {% csrf_token %}
-
-            <div class="col-md-4">
-                <label class="form-label">Apelido</label>
-                <input type="text" name="apelido" class="form-control" required placeholder="Seu apelido temporário">
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label">Mensagem</label>
-                <textarea name="texto" class="form-control" required rows="3" placeholder="Escreva sua mensagem..."></textarea>
-            </div>
-
-            <div class="col-md-12">
-                <button class="btn btn-primary w-100">Enviar comentário</button>
-            </div>
-        </form>
-    </div>
-
-    <!-- LISTA DE COMENTÁRIOS -->
-    {% for msg in mensagens %}
-        <div class="comment-box">
-
-            <strong>{{ msg.apelido }}</strong>
-            <p class="mt-1 mb-2">{{ msg.texto }}</p>
-
-            <span class="reply-button"
-                  @click="openReply = openReply === '{{ msg.id }}' ? null : '{{ msg.id }}' ">
-                Responder
-            </span>
-
-            <!-- FORM DE RESPOSTA -->
-            <div x-show="openReply === '{{ msg.id }}'" x-transition class="mt-3">
-                <form method="POST" action="{% url 'chat_responder' msg.id %}">
-                    {% csrf_token %}
-                    <input type="text" name="apelido" class="form-control mb-2" placeholder="Seu apelido" required>
-                    <textarea name="texto" rows="2" class="form-control mb-2" placeholder="Sua resposta..." required></textarea>
-                    <button class="btn btn-outline-light btn-sm">Enviar resposta</button>
-                </form>
-            </div>
-
-            <!-- RESPOSTAS -->
-            {% for resp in msg.respostas.all %}
-                <div class="comment-box reply-box mt-3">
-                    <strong>{{ resp.apelido }}</strong>
-                    <p class="mt-1 mb-2">{{ resp.texto }}</p>
-                </div>
-            {% endfor %}
-
+  </head>
+  <body>
+    <header class="py-2 bg-white shadow-sm">
+      <div class="container chat-inner d-flex align-items-center">
+        <h5 class="mb-0">Fórum Interativo — Alerta Digital</h5>
+        <div class="ms-auto text-muted small">
+          <!-- mostrar usuário se houver -->
+          {% if usuario %}
+            Conectado como: <strong>{{ usuario.nome }}</strong>
+          {% else %}
+            <a href="{% url 'login' %}">Entrar</a>
+          {% endif %}
         </div>
-    {% empty %}
-        <p class="text-center mt-4">Nenhum comentário ainda. Seja o primeiro!</p>
-    {% endfor %}
-</div>
+      </div>
+    </header>
 
-</body>
+    <main class="chat-container">
+      <div class="chat-inner">
+        <!-- área das mensagens -->
+        <div id="mensagens-lista" class="mb-4">
+          {% if mensagens %}
+            {% for m in mensagens %}
+              <div class="card mensagem-card {% if forloop.counter > 15 %}mensagem-oculta{% endif %}" data-index="{{ forloop.counter0 }}">
+                <div class="card-body">
+                  <div class="d-flex align-items-start justify-content-between">
+                    <div>
+                      <div class="mensagem-topo">
+                        {{ m.apelido|default:"Anônimo" }} 
+                        <small class="text-muted">· {{ m.criado_em|date:"d/m/Y H:i" }}</small>
+                      </div>
+                      <div class="mt-2">{{ m.texto|linebreaksbr }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="sem-mensagens">
+              <p>Nenhuma mensagem ainda. Seja o primeiro a escrever!</p>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- indicador de carregamento ao revelar mais -->
+        <div id="loader" class="text-center text-muted py-2" style="display:none;">
+          Carregando mais mensagens...
+        </div>
+      </div>
+    </main>
+
+    <footer class="chat-footer">
+      <div class="container chat-inner">
+        {% if usuario %}
+          <form id="chat-form" method="post" action="{% url 'chat' %}">
+            {% csrf_token %}
+            <div class="row g-2">
+              <div class="col-12 col-md-3">
+                <input type="text" name="apelido" id="apelido" maxlength="50" class="form-control" placeholder="Seu apelido (anônimo)" value="" />
+              </div>
+              <div class="col-12 col-md-7">
+                <input type="text" name="texto" id="texto" maxlength="1000" class="form-control" placeholder="Escreva sua mensagem..." autocomplete="off" required />
+              </div>
+              <div class="col-12 col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">Enviar</button>
+              </div>
+            </div>
+          </form>
+        {% else %}
+          <div class="row">
+            <div class="col-12">
+              <div class="alert alert-warning mb-0">
+                Você precisa estar logado para enviar mensagens. <a href="{% url 'login' %}">Entrar</a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </footer>
+
+    <!-- JS: Bootstrap bundle + script de infinite reveal -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      (function() {
+        // revelar mensagens em blocos para simular scroll infinito
+        const CHUNK = 15;              // quantas mensagens mostrar por bloco
+        let visibleCount = 0;
+        const allCards = Array.from(document.querySelectorAll('.mensagem-card'));
+        const total = allCards.length;
+        const loader = document.getElementById('loader');
+
+        function showNextChunk() {
+          const next = visibleCount + CHUNK;
+          for (let i = visibleCount; i < next && i < total; i++) {
+            const card = allCards[i];
+            if (card) card.style.display = ''; // remove display:none
+            card.classList.remove('mensagem-oculta');
+          }
+          visibleCount = Math.min(next, total);
+          if (visibleCount >= total) {
+            // tudo mostrado
+            window.removeEventListener('scroll', onScrollThrottled);
+            loader.style.display = 'none';
+          }
+        }
+
+        // inicializa
+        function init() {
+          // as mensagens no template estão ordenadas da mais nova (índice 0) para a mais antiga
+          // queremos mostrar os primeiros CHUNK
+          visibleCount = 0;
+          showNextChunk();
+
+          // caso tenha poucas mensagens, esconder loader
+          if (visibleCount >= total) loader.style.display = 'none';
+        }
+
+        // detectar scroll perto do fim da página -> revelar mais
+        function onScroll() {
+          const scrollBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 120);
+          if (scrollBottom && visibleCount < total) {
+            loader.style.display = '';
+            // simular pequena espera
+            setTimeout(function() {
+              showNextChunk();
+            }, 200);
+          }
+        }
+
+        // throttle simples
+        let scrollTimeout = null;
+        function onScrollThrottled() {
+          if (scrollTimeout) return;
+          scrollTimeout = setTimeout(function() {
+            onScroll();
+            scrollTimeout = null;
+          }, 150);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+        window.addEventListener('scroll', onScrollThrottled);
+
+        // opcional: ao submeter o form, desabilitar botão pra evitar multiple submits
+        const form = document.getElementById('chat-form');
+        if (form) {
+          form.addEventListener('submit', function() {
+            const btn = form.querySelector('button[type="submit"]');
+            if (btn) {
+              btn.disabled = true;
+              btn.innerText = 'Enviando...';
+            }
+          });
+        }
+      })();
+    </script>
+  </body>
 </html>
